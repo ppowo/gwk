@@ -1,0 +1,98 @@
+//go:build mage
+
+package main
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
+)
+
+var Default = Build
+
+func Build() error {
+	fmt.Println("Building gwk...")
+
+	if err := sh.Run("go", "vet", "./..."); err != nil {
+		return fmt.Errorf("go vet failed: %w", err)
+	}
+
+	if err := os.MkdirAll("bin", 0755); err != nil {
+		return err
+	}
+
+	binary := "bin/gwk"
+
+	env := map[string]string{}
+	if os.Getenv("CGO_ENABLED") == "" {
+		env["CGO_ENABLED"] = "0"
+	}
+
+	gitDesc, _ := sh.Output("git", "describe", "--tags", "--always", "--dirty")
+	gitCommit, _ := sh.Output("git", "rev-parse", "--short", "HEAD")
+	buildDate, _ := sh.Output("date", "-u", "+%Y-%m-%dT%H:%M:%SZ")
+
+	if gitDesc == "" {
+		gitDesc = "dev"
+	}
+	if gitCommit == "" {
+		gitCommit = "unknown"
+	}
+	if buildDate == "" {
+		buildDate = "unknown"
+	}
+
+	ldflags := fmt.Sprintf(
+		"-s -w -X main.version=%s -X main.commit=%s -X main.date=%s",
+		gitDesc, gitCommit, buildDate,
+	)
+
+	return sh.RunWith(env, "go", "build",
+		"-ldflags="+ldflags,
+		"-trimpath",
+		"-buildvcs=false",
+		"-o", binary,
+		".")
+}
+
+func Install() error {
+	fmt.Println("Installing gwk...")
+	mg.Deps(Build)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	installDir := filepath.Join(home, ".bio", "bin")
+	if _, err := os.Stat(installDir); os.IsNotExist(err) {
+		return fmt.Errorf("install directory %s does not exist", installDir)
+	}
+
+	binary := "gwk"
+
+	src := filepath.Join("bin", binary)
+	dst := filepath.Join(installDir, binary)
+
+	if err := sh.Copy(dst, src); err != nil {
+		return fmt.Errorf("failed to copy binary: %w", err)
+	}
+	if err := os.Chmod(dst, 0755); err != nil {
+		return err
+	}
+
+	fmt.Printf("✓ Installed to %s\n", dst)
+	return nil
+}
+
+func Clean() error {
+	fmt.Println("Cleaning...")
+	return sh.Rm("bin")
+}
+
+func Vet() error {
+	fmt.Println("Running go vet...")
+	return sh.Run("go", "vet", "./...")
+}
