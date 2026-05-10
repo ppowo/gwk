@@ -10,7 +10,7 @@ See [`CONTEXT.md`](../CONTEXT.md). The essential concepts are:
 - **Repository**: url + branch + tags
 - **Tag**: user-defined strings for directory naming and disambiguation
 - **Sync**: mutes local clones via `git fetch`/`git reset --hard`
-- **Read-Only Clone**: local workspace under `~/code-mirror/`, never user-modified
+- **Read-Only Clone**: local workspace under `~/CodeMirror/`, never user-modified
 - **Status**: read-only comparison of local HEAD vs remote HEAD
 
 ## Deepening Opportunities
@@ -42,7 +42,7 @@ RemoteHead(url, branch string) (string, error)  // ls-remote
 LocalHead(repoPath string) (string, error)      // rev-parse HEAD
 ```
 
-**Depth.** The caller sees four clean operations. Behind each: path validation (repoPath must be inside `~/code-mirror/`), argument construction, stdout/stderr capture, exit-code checking, and SHA parsing. High **locality**: if git output format changes, only this module changes.
+**Depth.** The caller sees four clean operations. Behind each: path validation (repoPath must be inside `~/CodeMirror/`), argument construction, stdout/stderr capture, exit-code checking, and SHA parsing. High **locality**: if git output format changes, only this module changes.
 
 **Seam.** An in-memory fake Git interactor (tracking a map of `(url,branch) → sha`) would satisfy the interface. Two adapters: the real `exec.Command` adapter and a test fake. With two adapters, the seam is real, not hypothetical.
 

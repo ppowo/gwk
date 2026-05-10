@@ -76,7 +76,7 @@ func mirrorDir() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("getting home directory: %w", err)
 	}
-	return filepath.Join(home, "code-mirror"), nil
+	return filepath.Join(home, "CodeMirror"), nil
 }
 
 func runSync() error {
@@ -94,7 +94,7 @@ func runSync() error {
 		return err
 	}
 	if err := os.MkdirAll(md, 0755); err != nil {
-		return fmt.Errorf("creating code-mirror directory: %w", err)
+		return fmt.Errorf("creating CodeMirror directory: %w", err)
 	}
 
 	g, err := git.NewExec(md)

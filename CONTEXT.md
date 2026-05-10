@@ -5,7 +5,7 @@
 - **Repository** (or **Repo**): A git repository identified by a clone URL, branch, and a set of user-defined tags. Defined in `~/.gwk.json`.
 - **Sync**: The primary operation that clones (if missing) and updates Repositories to the latest commit of their configured branch.
 - **Read-Only Clone**: A local git clone maintained solely as a source of up-to-date code (e.g., LLM context), never modified by the user. Sync mutates the local clone via `git fetch`/`git reset`, but the repo itself is treated as read-only (no user commits, no pushes).
-- **Tag**: A user-defined string (e.g., "psa", "VULTURE", "terano") associated with a Repository. Used to build the directory name under `~/code-mirror/`.
+- **Tag**: A user-defined string (e.g., "psa", "VULTURE", "terano") associated with a Repository. Used to build the directory name under `~/CodeMirror/`.
 
 ## Commands
 
@@ -27,7 +27,7 @@
 
 ## Directory Naming
 
-- Repositories are cloned to `~/code-mirror/<directory-name>/`.
+- Repositories are cloned to `~/CodeMirror/<directory-name>/`.
 - `<directory-name>` format: `<repo-name>-<branch>-<tags-joined-by-hyphens>`.
   - `<repo-name>` is extracted from the last path segment of the URL (e.g., `mto-suite` from `github.com/org/mto-suite.git`).
   - `<branch>` is the branch to sync (e.g., `develop_COPIA`).
@@ -37,10 +37,10 @@
 
 ## Sync Mechanics
 
-- `~/code-mirror/` is created automatically if missing when `sync` runs.
-1. **Missing clone:** `git clone --branch <branch> <url> ~/code-mirror/<directory-name>`.
+- `~/CodeMirror/` is created automatically if missing when `sync` runs.
+1. **Missing clone:** `git clone --branch <branch> <url> ~/CodeMirror/<directory-name>`.
 2. **Existing clone update:** `git fetch origin`, `git checkout <branch>`, `git reset --hard origin/<branch>`.
-3. **Validation:** Before any destructive operation, verify the repo's absolute path is inside `~/code-mirror/`. If not, exit immediately with an error.
+3. **Validation:** Before any destructive operation, verify the repo's absolute path is inside `~/CodeMirror/`. If not, exit immediately with an error.
 4. On any git command failure: gwk exits immediately with an error. No retries.
 5. Sync runs sequentially (one repo at a time).
 6. Output is minimal: a short line per repo indicating action and result.
@@ -48,7 +48,7 @@
 ## Status Mechanics
 
 - For each configured Repository, get remote HEAD via `git ls-remote origin refs/heads/<branch>`.
-- Get local HEAD via `git -C ~/code-mirror/<directory-name> rev-parse HEAD`.
+- Get local HEAD via `git -C ~/CodeMirror/<directory-name> rev-parse HEAD`.
 - Compare SHAs: print "up to date" or "behind" (or "missing" if clone doesn't exist).
 - Exits with status `0` if all repos are up to date, non-zero if any are behind or missing.
 

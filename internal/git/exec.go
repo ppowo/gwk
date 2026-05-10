@@ -11,7 +11,7 @@ import (
 
 // Exec is the real git adapter that shells out to the git binary.
 type Exec struct {
-	MirrorDir string // e.g. ~/code-mirror (resolved to absolute)
+	MirrorDir string // e.g. ~/CodeMirror (resolved to absolute)
 }
 
 func NewExec(mirrorDir string) (*Exec, error) {
@@ -101,7 +101,7 @@ func (e *Exec) validateInMirror(target string) error {
 		return fmt.Errorf("resolving path: %w", err)
 	}
 	// Ensure the target is a child of the mirror directory, not merely a string prefix
-	// like /home/me/code-mirror-evil.
+	// like /home/me/CodeMirror-evil.
 	rel, err := filepath.Rel(e.MirrorDir, abs)
 	if err != nil {
 		return fmt.Errorf("checking mirror-relative path: %w", err)
