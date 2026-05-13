@@ -77,7 +77,8 @@ func validateAndConvert(idx int, raw jsonRepo) (Repo, error) {
 	}
 
 	repoName := extractRepoName(raw.URL)
-	dirName := fmt.Sprintf("%s-%s-%s", repoName, raw.Branch, strings.Join(sanitized, "-"))
+	sanitizedBranch := sanitizeBranch(raw.Branch)
+	dirName := fmt.Sprintf("%s-%s-%s", repoName, sanitizedBranch, strings.Join(sanitized, "-"))
 
 	return Repo{
 		URL:           raw.URL,
@@ -91,6 +92,10 @@ func sanitizeTag(s string) string {
 	s = strings.ReplaceAll(s, " ", "-")
 	s = strings.ReplaceAll(s, "/", "")
 	return s
+}
+
+func sanitizeBranch(s string) string {
+	return strings.ReplaceAll(s, "/", "-")
 }
 
 func extractRepoName(url string) string {
